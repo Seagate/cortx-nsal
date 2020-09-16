@@ -31,8 +31,9 @@ NSAL_VERSION=${CORTXFS_VERSION:-"$(cat $NSAL_SOURCE_ROOT/VERSION)"}
 
 
 # Select NSAL Build Version.
-# Taken from git rev of NSAL repo
-NSAL_BUILD_VERSION="$(git -C $NSAL_SOURCE_ROOT rev-parse --short HEAD)"
+# Superproject: derived from cortxfs version.
+# Local: taken from git rev.
+NSAL_BUILD_VERSION=${CORTXFS_BUILD_VERSION:-"$(git rev-parse --short HEAD)"}
 
 # Optional, CORTX-UTILS source location.
 # Superproject: uses pre-defined location.
