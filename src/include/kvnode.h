@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  * For any questions about this software or licensing,
- * please email opensource@seagate.com or cortx-questions@seagate.com. 
+ * please email opensource@seagate.com or cortx-questions@seagate.com.
  */
 
 #ifndef _KVNODE_H_
@@ -254,4 +254,11 @@ int kvnode_del_sys_attr(const struct kvnode *node, const int key);
 uint16_t kvnode_get_basic_attr_buff(const struct kvnode *node,
 				    void **attr_buff);
 
+/* This API will validate the given kvnode is valid or not
+ *
+ * @param[in] node * - A pointer to kvnode which hold the opaque
+ *                     attribute information
+ * @return - true - if kvnode is valid, false - otherwise
+ */
+bool kvnode_invariant(const struct kvnode *node);
 #endif /* _KVNODE_H_ */
