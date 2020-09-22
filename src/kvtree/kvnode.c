@@ -14,7 +14,7 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  * For any questions about this software or licensing,
- * please email opensource@seagate.com or cortx-questions@seagate.com. 
+ * please email opensource@seagate.com or cortx-questions@seagate.com.
  */
 
 #include "kvtree.h"
@@ -304,4 +304,13 @@ uint16_t kvnode_get_basic_attr_buff(const struct kvnode *node, void **attr_buff)
 	*attr_buff = (void *)basic_attr->attr;
 
 	return basic_attr->size;
+}
+
+bool kvnode_invariant(const struct kvnode *node)
+{
+	bool rc = (node != NULL) &&
+		  (node->basic_attr != NULL) &&
+		  (node->tree != NULL);
+
+	return rc;
 }
