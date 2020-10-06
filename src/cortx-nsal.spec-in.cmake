@@ -61,8 +61,8 @@ The @PROJECT_NAME@ is Namespace Abstraction Layer library.
 %build
 cmake . -DUSE_KVS_REDIS=%{use_kvs_redis}     	\
 	-DUSE_KVS_CORTX=%{use_kvs_cortx}       	\
-	-DCORTXUTILSINC:PATH=@CORTXUTILSINC@     	\
-	-DLIBCORTXUTILS:PATH=@LIBCORTXUTILS@	\
+	-DCORTXUTILSINC:PATH="@CORTXUTILSINC@"     	\
+	-DLIBCORTXUTILS:PATH="@LIBCORTXUTILS@"	\
 	-DENABLE_DASSERT=%{enable_dassert}	\
 	-DPROJECT_NAME_BASE=@PROJECT_NAME_BASE@ \
 
