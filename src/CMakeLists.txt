@@ -86,6 +86,14 @@ else (ENABLE_DASSERT)
 	set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS}")
 endif (ENABLE_DASSERT)
 
+# Turns on ADDB-based TDSB wrappers.
+# When this flag is disabled, perfc TSDB code will be turned off.
+# When this flag is enabled, the utils module has to be
+# compiled with this flag enabled otherwise some of
+# the function calls will be undefined.
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -DENABLE_TSDB_ADDB")
+
+
 message( STATUS "ENABLE_DASSERT : ${ENABLE_DASSERT}")
 
 include(CheckIncludeFiles)
@@ -254,6 +262,8 @@ configure_file(
 )
 
 set(RPMDEST "--define '_srcrpmdir ${CMAKE_CURRENT_BINARY_DIR}'")
+
+
 
 add_custom_target( rpms DEPENDS dist)
 add_custom_command(TARGET rpms
