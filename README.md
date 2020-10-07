@@ -1,6 +1,9 @@
-[![Codacy Badge](https://app.codacy.com/project/badge/Grade/f0d0abc1e7534ce68c7d4fb4787ded9c)](https://www.codacy.com?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=Seagate/cortx-nsal&amp;utm_campaign=Badge_Grade)
+
 
 # NSAL
+
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/6beb9e8fb4e64743b293431e91a8d787)](https://app.codacy.com/gh/Seagate/cortx-nsal?utm_source=github.com&utm_medium=referral&utm_content=Seagate/cortx-nsal&utm_campaign=Badge_Grade)
+
 Namespace Abstraction Layer is created to facilitate the namespace management and abstraction on top of a object/cloud storage.
 
 ### Disclaimer
