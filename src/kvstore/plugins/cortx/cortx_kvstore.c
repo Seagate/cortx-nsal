@@ -28,53 +28,53 @@
 
 int cortx_kvs_init(struct collection_item *cfg_items)
 {
-    int rc;
-    perfc_trace_inii(PFT_CORTX_KVS_INIT, PEM_NSAL_TO_MOTR);
+	int rc;
+	perfc_trace_inii(PFT_CORTX_KVS_INIT, PEM_NSAL_TO_MOTR);
 	rc = m0init(cfg_items);
-    perfc_trace_finii(PERFC_TLS_POP_DONT_VERIFY);
-    return rc;
+	perfc_trace_finii(PERFC_TLS_POP_DONT_VERIFY);
+	return rc;
 }
 
 int cortx_kvs_fini(void)
 {
-    perfc_trace_inii(PFT_CORTX_KVS_FINISH, PEM_NSAL_TO_MOTR);
+	perfc_trace_inii(PFT_CORTX_KVS_FINISH, PEM_NSAL_TO_MOTR);
 	m0fini();
-    perfc_trace_finii(PERFC_TLS_POP_DONT_VERIFY);
+	perfc_trace_finii(PERFC_TLS_POP_DONT_VERIFY);
 	return 0;
 }
 
 int cortx_kvs_alloc(void **ptr, size_t size)
 {
-    perfc_trace_inii(PFT_CORTX_KVS_ALLOC, PEM_NSAL_TO_MOTR);
+	perfc_trace_inii(PFT_CORTX_KVS_ALLOC, PEM_NSAL_TO_MOTR);
 	*ptr = m0kvs_alloc(size);
 	if (*ptr == NULL) {
-        perfc_trace_finii(PERFC_TLS_POP_DONT_VERIFY);
+	perfc_trace_finii(PERFC_TLS_POP_DONT_VERIFY);
 		return -ENOMEM;
-    }
+	}
 
-    perfc_trace_finii(PERFC_TLS_POP_DONT_VERIFY);
+	perfc_trace_finii(PERFC_TLS_POP_DONT_VERIFY);
 	return 0;
 }
 
 void cortx_kvs_free(void *ptr)
 {
-    perfc_trace_inii(PFT_CORTX_KVS_FREE, PEM_NSAL_TO_MOTR);
+	perfc_trace_inii(PFT_CORTX_KVS_FREE, PEM_NSAL_TO_MOTR);
 	m0kvs_free(ptr);
-    perfc_trace_finii(PERFC_TLS_POP_DONT_VERIFY);
-    return;
+	perfc_trace_finii(PERFC_TLS_POP_DONT_VERIFY);
+	return;
 }
 
 
 int cortx_kvs_index_create(const kvs_idx_fid_t *fid, struct kvs_idx *index)
 {
-    int rc;
+	int rc;
 	struct m0_uint128 mfid = M0_UINT128(0, 0);
 	struct m0_idx *idx = NULL;
 	kvs_idx_fid_t gfid;
 
 	index->index_priv = NULL;
 
-    perfc_trace_inii(PFT_CORTX_KVS_INDEX_CREATE, PEM_NSAL_TO_MOTR);
+	perfc_trace_inii(PFT_CORTX_KVS_INDEX_CREATE, PEM_NSAL_TO_MOTR);
 
 	if (fid == NULL) {
         const char *vfid_str = cortx_kvs_get_gfid();
@@ -93,40 +93,40 @@ int cortx_kvs_index_create(const kvs_idx_fid_t *fid, struct kvs_idx *index)
 
 	}
 
-    rc = m0idx_create(&mfid, &idx);
-    if (rc != 0) {
-        fprintf(stderr, "Failed to create index, fid=%" PRIx64 ":%" PRIx64 "\n",
-                mfid.u_hi, mfid.u_lo);
+	rc = m0idx_create(&mfid, &idx);
+	if (rc != 0) {
+		fprintf(stderr, "Failed to create index, fid=%" PRIx64 ":%" PRIx64 "\n",
+				mfid.u_hi, mfid.u_lo);
 		goto out;
 	}
 
 	/** Use KVStore index's priv to track Motr motr index */
 	index->index_priv = idx;
 out:
-    perfc_trace_attr(PEA_NS_RES_RC, rc);
-    perfc_trace_finii(PERFC_TLS_POP_DONT_VERIFY);
+	perfc_trace_attr(PEA_NS_RES_RC, rc);
+	perfc_trace_finii(PERFC_TLS_POP_DONT_VERIFY);
 
-    return rc;
+	return rc;
 }
 
 int cortx_kvs_index_delete(const kvs_idx_fid_t *fid)
 {
-    int rc;
+	int rc;
 	struct m0_uint128 mfid = M0_UINT128(0, 0);
 
-    perfc_trace_inii(PFT_CORTX_KVS_INDEX_DELETE, PEM_NSAL_TO_MOTR);
+	perfc_trace_inii(PFT_CORTX_KVS_INDEX_DELETE, PEM_NSAL_TO_MOTR);
 	mfid.u_hi = fid->f_hi;
 	mfid.u_lo = fid->f_lo;
 
-    rc = m0idx_delete(&mfid);
+	rc = m0idx_delete(&mfid);
     if (rc != 0) {
-        fprintf(stderr, "Failed to delete index, fid=%" PRIx64 ":%" PRIx64 "\n",
-                mfid.u_hi, mfid.u_lo);
+		fprintf(stderr, "Failed to delete index, fid=%" PRIx64 ":%" PRIx64 "\n",
+				mfid.u_hi, mfid.u_lo);
 	}
 
-    perfc_trace_attr(PEA_NS_RES_RC, rc);
-    perfc_trace_finii(PERFC_TLS_POP_DONT_VERIFY);
-    return rc;
+	perfc_trace_attr(PEA_NS_RES_RC, rc);
+	perfc_trace_finii(PERFC_TLS_POP_DONT_VERIFY);
+	return rc;
 }
 
 int cortx_kvs_index_open(const kvs_idx_fid_t *fid, struct kvs_idx *index)
@@ -136,14 +136,14 @@ int cortx_kvs_index_open(const kvs_idx_fid_t *fid, struct kvs_idx *index)
 	struct m0_idx *idx = NULL;
 	kvs_idx_fid_t gfid;
 
-    perfc_trace_inii(PFT_CORTX_KVS_INDEX_OPEN, PEM_NSAL_TO_MOTR);
+	perfc_trace_inii(PFT_CORTX_KVS_INDEX_OPEN, PEM_NSAL_TO_MOTR);
 
 	index->index_priv = NULL;
 
 	if (fid == NULL) {
 		const char *vfid_str = cortx_kvs_get_gfid();
 
-        rc = cortx_kvs_fid_from_str(vfid_str, &gfid);
+		rc = cortx_kvs_fid_from_str(vfid_str, &gfid);
 
 		index->index_fid = gfid;
 
@@ -166,8 +166,8 @@ int cortx_kvs_index_open(const kvs_idx_fid_t *fid, struct kvs_idx *index)
 
 	index->index_priv = idx;
 out:
-    perfc_trace_attr(PEA_NS_RES_RC, rc);
-    perfc_trace_finii(PERFC_TLS_POP_DONT_VERIFY);
+	perfc_trace_attr(PEA_NS_RES_RC, rc);
+	perfc_trace_finii(PERFC_TLS_POP_DONT_VERIFY);
 	return rc;
 }
 
@@ -175,15 +175,15 @@ int cortx_kvs_index_close(struct kvs_idx *index)
 {
 	struct m0_idx *idx = (struct m0_idx *)index->index_priv;
 
-    perfc_trace_inii(PFT_CORTX_KVS_INDEX_CLOSE, PEM_NSAL_TO_MOTR);
+	perfc_trace_inii(PFT_CORTX_KVS_INDEX_CLOSE, PEM_NSAL_TO_MOTR);
 
-    m0idx_close(idx);
+	m0idx_close(idx);
 
 	index->index_priv = NULL;
 	index->index_fid.f_hi = 0;
 	index->index_fid.f_lo = 0;
 
-    perfc_trace_finii(PERFC_TLS_POP_DONT_VERIFY);
+	perfc_trace_finii(PERFC_TLS_POP_DONT_VERIFY);
 	return 0;
 }
 
@@ -205,63 +205,63 @@ int cortx_kvs_discard_transaction(struct kvs_idx *index)
 int cortx_kvs_get_bin(struct kvs_idx *index, void *k, const size_t klen,
 		      void **v, size_t *vlen)
 {
-    int rc;
-    perfc_trace_inii(PFT_CORTX_KVS_GET_BIN, PEM_NSAL_TO_MOTR);
-    rc = m0kvs_get(index->index_priv, k, klen, v, vlen);
-    perfc_trace_attr(PEA_NS_RES_RC, rc);
-    perfc_trace_finii(PERFC_TLS_POP_DONT_VERIFY);
-    return rc;
+	int rc;
+	perfc_trace_inii(PFT_CORTX_KVS_GET_BIN, PEM_NSAL_TO_MOTR);
+	rc = m0kvs_get(index->index_priv, k, klen, v, vlen);
+	perfc_trace_attr(PEA_NS_RES_RC, rc);
+	perfc_trace_finii(PERFC_TLS_POP_DONT_VERIFY);
+	return rc;
 }
 
 int cortx_kvs4_get_bin(void *k, const size_t klen, void **v, size_t *vlen)
 {
-    int rc;
-    perfc_trace_inii(PFT_CORTX_KVS4_GET_BIN, PEM_NSAL_TO_MOTR);
-    rc = m0kvs4_get(k, klen, v, vlen);
-    perfc_trace_attr(PEA_NS_RES_RC, rc);
-    perfc_trace_finii(PERFC_TLS_POP_DONT_VERIFY);
-    return rc;
+	int rc;
+	perfc_trace_inii(PFT_CORTX_KVS4_GET_BIN, PEM_NSAL_TO_MOTR);
+	rc = m0kvs4_get(k, klen, v, vlen);
+	perfc_trace_attr(PEA_NS_RES_RC, rc);
+	perfc_trace_finii(PERFC_TLS_POP_DONT_VERIFY);
+	return rc;
 }
 
 int cortx_kvs_set_bin(struct kvs_idx *index, void *k, const size_t klen,
 		      void *v, const size_t vlen)
 {
-    int rc;
-    perfc_trace_inii(PFT_CORTX_KVS_SET_BIN, PEM_NSAL_TO_MOTR);
-    rc = m0kvs_set(index->index_priv, k, klen, v, vlen);
-    perfc_trace_attr(PEA_NS_RES_RC, rc);
-    perfc_trace_finii(PERFC_TLS_POP_DONT_VERIFY);
-    return rc;
+	int rc;
+	perfc_trace_inii(PFT_CORTX_KVS_SET_BIN, PEM_NSAL_TO_MOTR);
+	rc = m0kvs_set(index->index_priv, k, klen, v, vlen);
+	perfc_trace_attr(PEA_NS_RES_RC, rc);
+	perfc_trace_finii(PERFC_TLS_POP_DONT_VERIFY);
+	return rc;
 }
 
 int cortx_kvs4_set_bin(void *k, const size_t klen, void *v, const size_t vlen)
 {
-    int rc;
-    perfc_trace_inii(PFT_CORTX_KVS4_SET_BIN, PEM_NSAL_TO_MOTR);
-    rc = m0kvs4_set(k, klen, v, vlen);
-    perfc_trace_attr(PEA_NS_RES_RC, rc);
-    perfc_trace_finii(PERFC_TLS_POP_DONT_VERIFY);
-    return rc;
+	int rc;
+	perfc_trace_inii(PFT_CORTX_KVS4_SET_BIN, PEM_NSAL_TO_MOTR);
+	rc = m0kvs4_set(k, klen, v, vlen);
+	perfc_trace_attr(PEA_NS_RES_RC, rc);
+	perfc_trace_finii(PERFC_TLS_POP_DONT_VERIFY);
+	return rc;
 }
 
 int cortx_kvs_del_bin(struct kvs_idx *index, const void *key, size_t klen)
 {
-    int rc;
-    perfc_trace_inii(PFT_CORTX_KVS_DELETE_BIN, PEM_NSAL_TO_MOTR);
-    rc = m0kvs_del(index->index_priv, (void *) key, klen);
-    perfc_trace_attr(PEA_NS_RES_RC, rc);
-    perfc_trace_finii(PERFC_TLS_POP_DONT_VERIFY);
-    return rc;
+	int rc;
+	perfc_trace_inii(PFT_CORTX_KVS_DELETE_BIN, PEM_NSAL_TO_MOTR);
+	rc = m0kvs_del(index->index_priv, (void *) key, klen);
+	perfc_trace_attr(PEA_NS_RES_RC, rc);
+	perfc_trace_finii(PERFC_TLS_POP_DONT_VERIFY);
+	return rc;
 }
 
 int cortx_kvs_gen_fid(kvs_idx_fid_t *index_fid)
 {
-    int rc;
-    perfc_trace_inii(PFT_CORTX_KVS_GEN_FID, PEM_NSAL_TO_MOTR);
-    rc = m0kvs_idx_gen_fid((struct m0_uint128 *) index_fid);
-    perfc_trace_attr(PEA_NS_RES_RC, rc);
-    perfc_trace_finii(PERFC_TLS_POP_DONT_VERIFY);
-    return rc;
+	int rc;
+	perfc_trace_inii(PFT_CORTX_KVS_GEN_FID, PEM_NSAL_TO_MOTR);
+	rc = m0kvs_idx_gen_fid((struct m0_uint128 *) index_fid);
+	perfc_trace_attr(PEA_NS_RES_RC, rc);
+	perfc_trace_finii(PERFC_TLS_POP_DONT_VERIFY);
+	return rc;
 }
 
 const char *cortx_kvs_get_gfid(void)
@@ -291,15 +291,15 @@ int cortx_kvs_get_list_size(void *ctx, char *pattern, size_t plen)
 	int size = 0;
 	int rc;
 
-    perfc_trace_inii(PFT_CORTX_KVS_GET_LIST_SIZE, PEM_NSAL_TO_MOTR);
+	perfc_trace_inii(PFT_CORTX_KVS_GET_LIST_SIZE, PEM_NSAL_TO_MOTR);
 	strcpy(initk, pattern);
 	initk[plen - 2] = '\0';
 
 	rc = m0kvs_pattern(ctx, initk, pattern,
 			   get_list_cb_size, &size);
-    perfc_trace_attr(PEA_KVS_LIST_SIZE, size);
-    perfc_trace_attr(PEA_NS_RES_RC, rc);
-    perfc_trace_finii(PERFC_TLS_POP_DONT_VERIFY);
+	perfc_trace_attr(PEA_KVS_LIST_SIZE, size);
+	perfc_trace_attr(PEA_NS_RES_RC, rc);
+	perfc_trace_finii(PERFC_TLS_POP_DONT_VERIFY);
 	if (rc < 0)
 		return rc;
 
@@ -323,9 +323,9 @@ void cortx_kvs_iter_get_kv(struct kvs_itr *iter, void **key, size_t *klen,
                            void **val, size_t *vlen)
 {
 	struct m0kvs_key_iter *priv = cortx_key_iter_priv(iter);
-    perfc_trace_inii(PFT_CORTX_KVS_ITER_GET_KV, PEM_NSAL_TO_MOTR);
+	perfc_trace_inii(PFT_CORTX_KVS_ITER_GET_KV, PEM_NSAL_TO_MOTR);
 	m0kvs_key_iter_get_kv(priv, key, klen, val, vlen);
-    perfc_trace_finii(PERFC_TLS_POP_DONT_VERIFY);
+	perfc_trace_finii(PERFC_TLS_POP_DONT_VERIFY);
 }
 
 int cortx_kvs_prefix_iter_has_prefix(struct kvs_itr *iter)
@@ -355,7 +355,7 @@ int cortx_kvs_prefix_iter_find(struct kvs_itr *iter)
 	int rc = 0;
 	struct m0kvs_key_iter *priv = NULL;
 
-    perfc_trace_inii(PFT_CORTX_KVS_PREFIX_ITER_FIND, PEM_NSAL_TO_MOTR);
+	perfc_trace_inii(PFT_CORTX_KVS_PREFIX_ITER_FIND, PEM_NSAL_TO_MOTR);
 
 	priv = cortx_key_iter_priv(iter);
 	priv->index = iter->idx.index_priv;
@@ -366,8 +366,8 @@ int cortx_kvs_prefix_iter_find(struct kvs_itr *iter)
 	}
 	rc = cortx_kvs_prefix_iter_has_prefix(iter);
 out:
-    perfc_trace_attr(PEA_NS_RES_RC, rc);
-    perfc_trace_finii(PERFC_TLS_POP_DONT_VERIFY);
+	perfc_trace_attr(PEA_NS_RES_RC, rc);
+	perfc_trace_finii(PERFC_TLS_POP_DONT_VERIFY);
 	return rc;
 }
 
@@ -375,7 +375,7 @@ out:
 int cortx_kvs_prefix_iter_next(struct kvs_itr *iter)
 {
 	int rc = 0;
-    perfc_trace_inii(PFT_CORTX_KVS_PREFIX_ITER_NEXT, PEM_NSAL_TO_MOTR);
+	perfc_trace_inii(PFT_CORTX_KVS_PREFIX_ITER_NEXT, PEM_NSAL_TO_MOTR);
 	struct m0kvs_key_iter *priv = cortx_key_iter_priv(iter);
 	rc = m0kvs_key_iter_next(priv);
 	iter->inner_rc = rc;
@@ -384,8 +384,8 @@ int cortx_kvs_prefix_iter_next(struct kvs_itr *iter)
 	}
 	rc = cortx_kvs_prefix_iter_has_prefix(iter);
 out:
-    perfc_trace_attr(PEA_NS_RES_RC, rc);
-    perfc_trace_finii(PERFC_TLS_POP_DONT_VERIFY);
+	perfc_trace_attr(PEA_NS_RES_RC, rc);
+	perfc_trace_finii(PERFC_TLS_POP_DONT_VERIFY);
 	return rc;
 }
 
@@ -393,9 +393,9 @@ out:
 void cortx_kvs_prefix_iter_fini(struct kvs_itr *iter)
 {
 	struct m0kvs_key_iter *priv = cortx_key_iter_priv(iter);
-    perfc_trace_inii(PFT_CORTX_KVS_PREFIX_ITER_FINISH, PEM_NSAL_TO_MOTR);
+	perfc_trace_inii(PFT_CORTX_KVS_PREFIX_ITER_FINISH, PEM_NSAL_TO_MOTR);
 	m0kvs_key_iter_fini(priv);
-    perfc_trace_finii(PERFC_TLS_POP_DONT_VERIFY);
+	perfc_trace_finii(PERFC_TLS_POP_DONT_VERIFY);
 }
 
 struct kvstore_ops cortx_kvs_ops = {
