@@ -27,7 +27,8 @@ NSAL_KVSTORE_BACKEND=${NSAL_KVSTORE_BACKEND:-"cortx"}
 # Select NSAL Source Version.
 # Superproject: derived from cortxfs version.
 # Local: taken fron VERSION file.
-NSAL_VERSION=${CORTXFS_VERSION:-"$(cat $NSAL_SOURCE_ROOT/VERSION)"}
+NSAL_VERSION_TEMP=$(cat "$NSAL_SOURCE_ROOT/VERSION")
+NSAL_VERSION=${CORTXFS_VERSION:-"$NSAL_VERSION_TEMP"}
 
 
 # Select NSAL Build Version.
@@ -95,40 +96,53 @@ nsal_print_env() {
 
 ###############################################################################
 nsal_configure() {
-    if [ -f $NSAL_BUILD/.config ]; then
+    if [ -f "$NSAL_BUILD/.config" ]; then
         echo "Build folder exists. Please remove it."
         exit 1;
     fi
 
-    mkdir $NSAL_BUILD
-    cd $NSAL_BUILD
+    mkdir "$NSAL_BUILD"
+    cd "$NSAL_BUILD"
 
     local cmd="cmake \
 -DKVS_LIST=${KVS_LIST} \
--DLIBCORTXUTILS:PATH=${CORTX_UTILS_LIB} \
--DCORTXUTILSINC:PATH=${CORTX_UTILS_INC} \
+-DLIBCORTXUTILS:PATH=\"$CORTX_UTILS_LIB\" \
+-DCORTXUTILSINC:PATH=\"$CORTX_UTILS_INC\" \
 -DBASE_VERSION:STRING=${NSAL_VERSION} \
 -DRELEASE_VER:STRING=${NSAL_BUILD_VERSION} \
--DLIBCORTXUTILS:PATH=${CORTX_UTILS_LIB} \
--DCORTXUTILSINC:PATH=${CORTX_UTILS_INC} \
+-DLIBCORTXUTILS:PATH=\"$CORTX_UTILS_LIB\" \
+-DCORTXUTILSINC:PATH=\"$CORTX_UTILS_INC\" \
 -DENABLE_DASSERT=${ENABLE_DASSERT} \
 -DPROJECT_NAME_BASE:STRING=${PROJECT_NAME_BASE} \
--DINSTALL_DIR_ROOT:STRING=${INSTALL_DIR_ROOT}
+-DINSTALL_DIR_ROOT:STRING=${INSTALL_DIR_ROOT} \
 $NSAL_SRC"
-    echo -e "Config:\n $cmd" > $NSAL_BUILD/.config
-    echo -e "Env:\n $(nsal_print_env)" >> $NSAL_BUILD/.config
-    $cmd
+    echo -e "Config:\n $cmd" > "$NSAL_BUILD/.config"
+    echo -e "Env:\n $(nsal_print_env)" >> "$NSAL_BUILD/.config"
+    #$cmd
+cmake \
+-DKVS_LIST="$KVS_LIST" \
+-DLIBCORTXUTILS:PATH="$CORTX_UTILS_LIB" \
+-DCORTXUTILSINC:PATH="$CORTX_UTILS_INC" \
+-DBASE_VERSION:STRING="$NSAL_VERSION" \
+-DRELEASE_VER:STRING="$NSAL_BUILD_VERSION" \
+-DLIBCORTXUTILS:PATH="$CORTX_UTILS_LIB" \
+-DCORTXUTILSINC:PATH="$CORTX_UTILS_INC" \
+-DENABLE_DASSERT="$ENABLE_DASSERT" \
+-DPROJECT_NAME_BASE:STRING="$PROJECT_NAME_BASE" \
+-DINSTALL_DIR_ROOT:STRING="$INSTALL_DIR_ROOT" \
+"$NSAL_SRC"
+
     cd -
 }
 
 ###############################################################################
 nsal_make() {
-    if [ ! -d $NSAL_BUILD ]; then
+    if [ ! -d "$NSAL_BUILD" ]; then
         echo "Build folder does not exist. Please run 'config'"
         exit 1;
     fi
 
-    cd $NSAL_BUILD
+    cd "$NSAL_BUILD"
     make "$@"
     cd -
 }

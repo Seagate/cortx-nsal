@@ -2,7 +2,7 @@
 
 # CORTX-NSAL
 
-[![Codacy Badge](https://api.codacy.com/project/badge/Grade/6beb9e8fb4e64743b293431e91a8d787)](https://app.codacy.com/gh/Seagate/cortx-nsal?utm_source=github.com&utm_medium=referral&utm_content=Seagate/cortx-nsal&utm_campaign=Badge_Grade)
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/6beb9e8fb4e64743b293431e91a8d787)](https://app.codacy.com/gh/Seagate/cortx-nsal?utm_source=github.com&utm_medium=referral&utm_content=Seagate/cortx-nsal&utm_campaign=Badge_Grade) [![License: AGPL v3](https://img.shields.io/badge/License-AGPL%20v3-blue.svg)](https://github.com/Seagate/cortx-nsal/blob/main/LICENSE) [![Slack](https://img.shields.io/badge/chat-on%20Slack-blue")](https://join.slack.com/t/cortxcommunity/shared_invite/zt-femhm3zm-yiCs5V9NBxh89a_709FFXQ?)
 
 The CORTX Namespace Abstraction Layer (NSAL) is created to facilitate the namespace management and abstraction on top of an object or cloud storage.
 
