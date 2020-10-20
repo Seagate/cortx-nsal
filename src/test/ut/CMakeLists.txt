@@ -13,6 +13,7 @@ configure_file(ut_nsal.conf ut_nsal.conf COPYONLY)
 add_executable(ut_nsal_ns_ops ut_nsal_ns_ops.c)
 add_executable(ut_nsal_kvtree_ops ut_nsal_kvtree_ops.c)
 add_executable(ut_nsal_iter_ops ut_nsal_iter_ops.c)
+add_executable(ut_global_kvs ut_global_kvs.c)
 
 link_directories(${LIBKVSTORE})
 set(CMAKE_INSTALL_RPATH "${LIBKVSTORE}")
@@ -30,6 +31,12 @@ target_link_libraries(ut_nsal_iter_ops
 )
 
 target_link_libraries(ut_nsal_kvtree_ops
+	${PROJECT_NAME_BASE}-utils
+	${PROJECT_NAME_BASE}-nsal
+	${STORE_LIBRARY}
+)
+
+target_link_libraries(ut_global_kvs
 	${PROJECT_NAME_BASE}-utils
 	${PROJECT_NAME_BASE}-nsal
 	${STORE_LIBRARY}

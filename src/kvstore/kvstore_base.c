@@ -33,6 +33,7 @@
 #define TYPE "type"
 
 static struct kvstore g_kvstore;
+bool kvs_init_done = false;
 
 struct kvstore_module {
     char *type;
@@ -89,6 +90,7 @@ static inline int __kvs_init(struct kvstore *kvstore,
 	}
 
 	kvstore->type = kvstore_type;
+	kvs_init_done = true;
 out:
 	return rc;
 }
