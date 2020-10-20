@@ -220,7 +220,7 @@ static inline int __kvs_get(struct kvstore *kvstore, struct kvs_idx *index,
 }
 
 int kvs_get(struct kvstore *kvstore, struct kvs_idx *index, void *k,
-	G1G    const size_t klen, void **v, size_t *vlen)
+	    const size_t klen, void **v, size_t *vlen)
 {
 	int rc;
 
