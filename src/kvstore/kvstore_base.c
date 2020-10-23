@@ -33,6 +33,7 @@
 #define TYPE "type"
 
 static struct kvstore g_kvstore;
+bool kvs_init_done = false;
 
 struct kvstore_module {
     char *type;
@@ -52,8 +53,8 @@ struct kvstore *kvstore_get(void)
 	return &g_kvstore;
 }
 
-int kvs_init(struct kvstore *kvstore, struct collection_item *cfg)
-
+static inline int __kvs_init(struct kvstore *kvstore,
+                             struct collection_item *cfg)
 {
 	int rc = 0, i;
 	char *kvstore_type = NULL;
@@ -89,15 +90,43 @@ int kvs_init(struct kvstore *kvstore, struct collection_item *cfg)
 	}
 
 	kvstore->type = kvstore_type;
+	kvs_init_done = true;
 out:
 	return rc;
 }
 
-int kvs_fini(struct kvstore *kvstore)
+int kvs_init(struct kvstore *kvstore, struct collection_item *cfg)
+{
+	int rc;
+
+	perfc_trace_inii(PFT_KVS_INIT, PEM_KVS_TO_NFS);
+
+	rc = __kvs_init(kvstore, cfg);
+
+	perfc_trace_attr(PEA_KVS_RES_RC, rc);
+	perfc_trace_finii(PERFC_TLS_POP_DONT_VERIFY);
+
+	return rc;
+}
+static inline int __kvs_fini(struct kvstore *kvstore)
 {
 	dassert(kvstore && kvstore->kvstore_ops && kvstore->kvstore_ops->fini);
 
 	return kvstore->kvstore_ops->fini();
+}
+
+int kvs_fini(struct kvstore *kvstore)
+{
+	int rc;
+
+	perfc_trace_inii(PFT_KVS_FINI, PEM_KVS_TO_NFS);
+
+	rc = __kvs_fini(kvstore);
+
+	perfc_trace_attr(PEA_KVS_RES_RC, rc);
+	perfc_trace_finii(PERFC_TLS_POP_DONT_VERIFY);
+
+	return rc;
 }
 
 int kvs_fid_from_str(const char *fid_str, kvs_idx_fid_t *out_fid)
@@ -105,7 +134,7 @@ int kvs_fid_from_str(const char *fid_str, kvs_idx_fid_t *out_fid)
 	return cortx_kvs_fid_from_str(fid_str, out_fid);
 }
 
-static int __kvs_alloc(struct kvstore *kvstore, void **ptr, size_t size)
+static inline int __kvs_alloc(struct kvstore *kvstore, void **ptr, size_t size)
 {
 	dassert(kvstore);
 	return kvstore->kvstore_ops->alloc(ptr, size);
@@ -120,16 +149,25 @@ int kvs_alloc(struct kvstore *kvstore, void **ptr, size_t size)
 
 	rc = __kvs_alloc(kvstore, ptr, size);
 
-	perfc_trace_attr(PEA_KVS_ALLOC_RES_RC, rc);
+	perfc_trace_attr(PEA_KVS_RES_RC, rc);
 	perfc_trace_finii(PERFC_TLS_POP_DONT_VERIFY);
 
 	return rc;
 }
 
-void kvs_free(struct kvstore *kvstore, void *ptr)
+static inline void __kvs_free(struct kvstore *kvstore, void *ptr)
 {
 	dassert(kvstore);
 	return kvstore->kvstore_ops->free(ptr);
+}
+
+void kvs_free(struct kvstore *kvstore, void *ptr)
+{
+	perfc_trace_inii(PFT_KVS_FREE, PEM_KVS_TO_NFS);
+
+	__kvs_free(kvstore, ptr);
+
+	perfc_trace_finii(PERFC_TLS_POP_DONT_VERIFY);
 }
 
 int kvs_begin_transaction(struct kvstore *kvstore, struct kvs_idx *index)
@@ -176,8 +214,8 @@ int kvs_index_close(struct kvstore *kvstore, struct kvs_idx *index)
 	return kvstore->kvstore_ops->index_close(index);
 }
 
-static int __kvs_get(struct kvstore *kvstore, struct kvs_idx *index, void *k,
-		     const size_t klen, void **v, size_t *vlen)
+static inline int __kvs_get(struct kvstore *kvstore, struct kvs_idx *index,
+                            void *k, const size_t klen, void **v, size_t *vlen)
 {
 	dassert(kvstore);
 	return kvstore->kvstore_ops->get_bin(index, k, klen, v, vlen);
@@ -189,24 +227,41 @@ int kvs_get(struct kvstore *kvstore, struct kvs_idx *index, void *k,
 	int rc;
 
 	perfc_trace_inii(PFT_KVS_GET, PEM_KVS_TO_NFS);
-	perfc_trace_attr(PEA_KVS_GET_KLEN, klen);
-	perfc_trace_attr(PEA_KVS_GET_VLEN, *vlen);
+	perfc_trace_attr(PEA_KVS_KLEN, klen);
+	perfc_trace_attr(PEA_KVS_VLEN, *vlen);
 
 	rc = __kvs_get(kvstore, index, k, klen, v, vlen);
 
-	perfc_trace_attr(PEA_KVS_GET_RES_RC, rc);
+	perfc_trace_attr(PEA_KVS_RES_RC, rc);
 	perfc_trace_finii(PERFC_TLS_POP_DONT_VERIFY);
 
 	return rc;
 }
 
-int kvs_set(struct kvstore *kvstore, struct kvs_idx *index, void *k, const size_t klen,
-	        void *v, const size_t vlen)
+static inline int __kvs_set(struct kvstore *kvstore, struct kvs_idx *index,
+                            void *k, const size_t klen,void *v,
+                            const size_t vlen)
 {
 	dassert(kvstore);
 	return kvstore->kvstore_ops->set_bin(index, k, klen, v, vlen);
 }
 
+int kvs_set(struct kvstore *kvstore, struct kvs_idx *index, void *k,
+			const size_t klen, void *v, const size_t vlen)
+{
+	int rc;
+
+	perfc_trace_inii(PFT_KVS_SET, PEM_KVS_TO_NFS);
+	perfc_trace_attr(PEA_KVS_KLEN, klen);
+	perfc_trace_attr(PEA_KVS_VLEN, vlen);
+
+	rc = __kvs_set(kvstore, index, k, klen, v, vlen);
+
+	perfc_trace_attr(PEA_KVS_RES_RC, rc);
+	perfc_trace_finii(PERFC_TLS_POP_DONT_VERIFY);
+
+	return rc;
+}
 int kvs_del(struct kvstore *kvstore, struct kvs_idx *index, const void *k,
             size_t klen)
 {
