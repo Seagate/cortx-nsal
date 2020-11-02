@@ -28,6 +28,7 @@
 #include <common/helpers.h>
 #include <common/log.h>
 #include "operation.h"
+#include "../../../../cortxfs/src/include/addb/cfs_perfc.h"
 
 #define KVSTORE "kvstore"
 #define TYPE "type"

@@ -23,6 +23,7 @@
 #include "common/helpers.h" /* RC_WRAP_LABEL */
 #include "md_common.h"
 #include "operation.h"
+#include "../../../../cortxfs/src/include/addb/cfs_perfc.h"
 
 #define DEFAULT_ROOT_ID 2LL
 
