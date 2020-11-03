@@ -68,7 +68,7 @@ void m0_key_iter_fini(struct kvstore_iter *iter)
 {
 	struct m0_key_iter_priv *priv = m0_key_iter_priv(iter);
 
-	perfc_trace_inii(PFT_M0_KEY_ITER_FINISH, PEM_NFS_TO_MOTR);
+	perfc_trace_inii(PFT_M0_KEY_ITER_FINISH, PEM_NSAL_NFS_TO_MOTR);
 	if (!priv->initialized)
 		goto out;
 
@@ -79,13 +79,13 @@ void m0_key_iter_fini(struct kvstore_iter *iter)
 		perfc_trace_attr(PEA_M0_OP_SM_ID, priv->op->op_sm.sm_id);
 		perfc_trace_attr(PEA_M0_OP_SM_STATE, priv->op->op_sm.sm_state);
 
-		perfc_trace_attr(PEA_TIME_ATTR_START_M0_OP_FINISH);
+		perfc_trace_attr(PEA_TIME_ATTR_START_NSAL_M0_OP_FINISH);
 		m0_op_fini(priv->op);
-		perfc_trace_attr(PEA_TIME_ATTR_END_M0_OP_FINISH);
+		perfc_trace_attr(PEA_TIME_ATTR_END_NSAL_M0_OP_FINISH);
 
-		perfc_trace_attr(PEA_TIME_ATTR_START_M0_OP_FREE);
+		perfc_trace_attr(PEA_TIME_ATTR_START_NSAL_M0_OP_FREE);
 		m0_op_free(priv->op);
-		perfc_trace_attr(PEA_TIME_ATTR_END_M0_OP_FREE);
+		perfc_trace_attr(PEA_TIME_ATTR_END_NSAL_M0_OP_FREE);
 	}
 
 out:
@@ -103,7 +103,7 @@ bool m0_key_iter_find(struct kvstore_iter *iter, const void* prefix,
 	struct m0_idx *index = iter->idx.index_priv;
 	int rc;
 
-	perfc_trace_inii(PFT_M0_KEY_ITER_FIND, PEM_NFS_TO_MOTR);
+	perfc_trace_inii(PFT_M0_KEY_ITER_FIND, PEM_NSAL_NFS_TO_MOTR);
 	if (prefix_len == 0)
 		rc = m0_bufvec_empty_alloc(key, 1);
 	else
@@ -128,14 +128,14 @@ bool m0_key_iter_find(struct kvstore_iter *iter, const void* prefix,
 		goto out_free_val;
 	}
 
-	perfc_trace_attr(PEA_TIME_ATTR_START_M0_OP_LAUNCH);
+	perfc_trace_attr(PEA_TIME_ATTR_START_NSAL_M0_OP_LAUNCH);
 	m0_op_launch(op, 1);
-	perfc_trace_attr(PEA_TIME_ATTR_END_M0_OP_LAUNCH);
+	perfc_trace_attr(PEA_TIME_ATTR_END_NSAL_M0_OP_LAUNCH);
 
-	perfc_trace_attr(PEA_TIME_ATTR_START_M0_OP_WAIT);
+	perfc_trace_attr(PEA_TIME_ATTR_START_NSAL_M0_OP_WAIT);
 	rc = m0_op_wait(*op, M0_BITS(M0_OS_STABLE),
 			M0_TIME_NEVER);
-	perfc_trace_attr(PEA_TIME_ATTR_END_M0_OP_WAIT);
+	perfc_trace_attr(PEA_TIME_ATTR_END_NSAL_M0_OP_WAIT);
 
 	perfc_trace_attr(PEA_M0_OP_SM_ID, (*op)->op_sm.sm_id);
 	perfc_trace_attr(PEA_M0_OP_SM_STATE, (*op)->op_sm.sm_state);
@@ -156,13 +156,13 @@ bool m0_key_iter_find(struct kvstore_iter *iter, const void* prefix,
 
 out_free_op:
 	if (op && *op) {
-		perfc_trace_attr(PEA_TIME_ATTR_START_M0_OP_FINISH);
+		perfc_trace_attr(PEA_TIME_ATTR_START_NSAL_M0_OP_FINISH);
 		m0_op_fini(*op);
-		perfc_trace_attr(PEA_TIME_ATTR_END_M0_OP_FINISH);
+		perfc_trace_attr(PEA_TIME_ATTR_END_NSAL_M0_OP_FINISH);
 
-		perfc_trace_attr(PEA_TIME_ATTR_START_M0_OP_FREE);
+		perfc_trace_attr(PEA_TIME_ATTR_START_NSAL_M0_OP_FREE);
 		m0_op_free(*op);
-		perfc_trace_attr(PEA_TIME_ATTR_END_M0_OP_FREE);
+		perfc_trace_attr(PEA_TIME_ATTR_END_NSAL_M0_OP_FREE);
 	}
 
 out_free_val:
@@ -203,7 +203,7 @@ bool m0_key_iter_next(struct kvstore_iter *iter)
 	struct m0_idx *index = iter->idx.index_priv;
 	bool can_get_next = false;
 
-    perfc_trace_inii(PFT_M0_KEY_ITER_NEXT, PEM_NFS_TO_MOTR);
+	perfc_trace_inii(PFT_M0_KEY_ITER_NEXT, PEM_NSAL_NFS_TO_MOTR);
 	assert(priv->initialized);
 
 	/* Motr API: "'vals' vector ... should contain NULLs" */
@@ -219,9 +219,9 @@ bool m0_key_iter_next(struct kvstore_iter *iter)
 		goto out;
 	}
 
-	perfc_trace_attr(PEA_TIME_ATTR_START_M0_OP_LAUNCH);
+	perfc_trace_attr(PEA_TIME_ATTR_START_NSAL_M0_OP_LAUNCH);
 	m0_op_launch(&priv->op, 1);
-	perfc_trace_attr(PEA_TIME_ATTR_END_M0_OP_LAUNCH);
+	perfc_trace_attr(PEA_TIME_ATTR_END_NSAL_M0_OP_LAUNCH);
 
 	perfc_trace_attr(PEA_TIME_ATTR_START_M0_OP_WAIT);
 	iter->inner_rc = m0_op_wait(priv->op, M0_BITS(M0_OS_STABLE),
