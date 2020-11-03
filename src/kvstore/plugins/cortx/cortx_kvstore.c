@@ -25,6 +25,7 @@
 #include "internal/cortx/cortx_kvstore.h"
 #include <cortx/helpers.h>
 #include "operation.h"
+#include <cfs_nsal_perfc.h>
 
 int cortx_kvs_init(struct collection_item *cfg_items)
 {

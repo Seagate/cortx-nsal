@@ -28,6 +28,7 @@
 #include <common/helpers.h>
 #include <common/log.h>
 #include "operation.h"
+#include <cfs_nsal_perfc.h>
 
 #define KVSTORE "kvstore"
 #define TYPE "type"
