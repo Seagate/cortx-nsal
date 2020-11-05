@@ -22,6 +22,8 @@
 #include "kvnode.h"
 #include "common/helpers.h" /* RC_WRAP_LABEL */
 #include "md_common.h"
+#include "operation.h"
+#include <cfs_nsal_perfc.h>
 
 #define DEFAULT_ROOT_ID 2LL
 
@@ -277,7 +279,7 @@ out:
 }
 
 int kvtree_lookup(struct kvtree *tree, const node_id_t *parent_id,
-                  const str256_t *node_name, node_id_t *node_id)
+		  const str256_t *node_name, node_id_t *node_id)
 {
 	int rc = 0;
 	struct child_node_key *node_key = NULL;
@@ -348,8 +350,9 @@ int kvtree_has_children(struct kvtree *tree, const node_id_t *parent_id,
 	return rc;
 }
 
-int kvtree_iter_children(struct kvtree *tree, const node_id_t *parent_id,
-                         kvtree_iter_children_cb cb, void *cb_ctx)
+static inline int __kvtree_iter_children(struct kvtree *tree,
+		const node_id_t *parent_id, kvtree_iter_children_cb cb,
+		void *cb_ctx)
 {
 	struct child_node_key prefix = CHILD_NODE_PREFIX_INIT(parent_id);
 	int rc;
@@ -419,5 +422,17 @@ out:
 
 	log_debug("kvtree=%p, parent " NODE_ID_F ", rc=%d", tree,
 	           NODE_ID_P(parent_id), rc);
+	return rc;
+}
+
+int kvtree_iter_children(struct kvtree *tree, const node_id_t *parent_id,
+                         kvtree_iter_children_cb cb, void *cb_ctx)
+{
+	int rc;
+
+	perfc_trace_inii(PFT_KVTREE_ITER_CH, PEM_KVS_TO_NFS);
+	rc = __kvtree_iter_children(tree, parent_id, cb, cb_ctx);
+	perfc_trace_finii(PERFC_TLS_POP_DONT_VERIFY);
+
 	return rc;
 }
