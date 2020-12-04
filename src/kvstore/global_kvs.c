@@ -61,6 +61,7 @@ int nsal_set_global_kvs(const char *fid_str)
 		goto out;
 	}
 
+	log_test("TEST TEST TEST Into NSAL module \n");
 out:
 	return rc;
 }
