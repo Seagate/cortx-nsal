@@ -114,6 +114,13 @@ void kvs_itr_fini(struct kvstore *kvstore, struct kvs_itr *iter);
 void kvs_itr_get(struct kvstore *kvstore, struct kvs_itr *iter, void **key, size_t *klen,
                  void **val, size_t *vlen);
 
+typedef void (*key_memcpy_cb) (void *dst, void *src, size_t size);
+
+int kvs_itr_find_v1(struct kvstore *kvstore, struct kvs_idx *index, void *prefix,
+		    const size_t prefix_len, struct kvs_itr **iter, int batch_size);
+void kvs_itr_get_v1(struct kvstore *kvstore, struct kvs_itr *iter, void **key,
+		    size_t *klen, void **val, size_t *vlen);
+
 struct kvstore_ops {
 	/* Basic constructor and destructor */
 	int (*init) (struct collection_item *cfg);
@@ -148,6 +155,9 @@ struct kvstore_ops {
 	void (*kv_fini) (struct kvs_itr *iter);
 	void (*kv_get) (struct kvs_itr *iter, void **key, size_t *klen,
 	                void **val, size_t *vlen);
+	int (*kv_find_v1) (struct kvs_itr *iter);
+	void (*kv_get_v1) (struct kvs_itr *iter, void **key, size_t *klen,
+			   void **val, size_t *vlen);
 };
 
 int kvs_init(struct kvstore *kvstore, struct collection_item *cfg);
@@ -165,6 +175,7 @@ struct kvs_idx {
 struct kvs_itr {
 	struct kvs_idx idx;
 	buff_t prefix;
+	int batch_size;
 	int inner_rc;
 	char priv[KVSTORE_ITER_PRIV_DATA_SIZE];
 };
