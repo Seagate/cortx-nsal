@@ -23,9 +23,13 @@
 #include "common/helpers.h" /* RC_WRAP_LABEL */
 #include "nsal.h" /* nsal */
 #include "tenant.h" /* nsal */
+#include <m0log.h>
 
 static int nsal_initialized;
 struct kvs_idx g_ns_meta_index;
+
+const int  m0trace_common3 = 2813;
+
 
 /* Helper function: this will open the namespace index.
  * @param cfg_item[in]: collection item.
@@ -68,6 +72,9 @@ static int nsal_ns_open(struct collection_item *cfg_items,
 	RC_WRAP_LABEL(rc, out, kvs_index_open, kvstor, &ns_meta_fid, ns_meta_index);
 
 out:
+
+	log_test("************************* NSAL **************************** \n");
+
 	log_debug("rc=%d", rc);
 	return rc;
 }
@@ -126,6 +133,9 @@ int nsal_module_init(struct collection_item *cfg_items)
 		goto err;
 	}
 
+	test_m0log_setup();
+        test_m0log_common1_setup((const void*)&m0trace_common3);
+
 err:
 	log_debug("NSAL module initialized rc=%d", rc);
 	return rc;
@@ -156,6 +166,8 @@ int nsal_module_fini()
 	if (rc) {
 		log_err("kvs_fini failed, rc=%d", rc);
 	}
+
+	m0log_fini();
 
 	log_debug("NSAL module finalized, rc=%d", rc);
 	return rc;
