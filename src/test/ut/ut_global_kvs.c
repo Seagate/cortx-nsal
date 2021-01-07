@@ -25,8 +25,11 @@
 #include "global_kvs.h"
 #include "ut_nsal_ns.h"
 #include "nsal.h"
+#include <m0log.h>
 
 #define DEFAULT_CONFIG "/etc/cortx/cortxfs.conf"
+
+extern const int nsal_magic_symbol;
 
 struct test_key {
 	char type;
@@ -159,13 +162,19 @@ static void test_nsal_global_del_kv(void)
 }
 
 
-int main(void)
+int main(int argc, char *argv[])
 {
 	int rc = 0;
 	char *test_logs = "/var/log/cortx/test/ut/ut_nsal.logs";
 	int test_count, test_failed;
 
 	printf("Global KVS Tests\n");
+
+	if (argc > 1 && strcmp(argv[1], "decode") == 0)
+        {
+                rc = decoder((const void*)&nsal_magic_symbol, argv[2], argv[3]);
+                return rc;
+        }
 
 	rc = ut_load_config(CONF_FILE);
 	if (rc != 0) {
