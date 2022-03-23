@@ -23,9 +23,12 @@
 #include "common/helpers.h" /* RC_WRAP_LABEL */
 #include "nsal.h" /* nsal */
 #include "tenant.h" /* nsal */
+#include <m0log.h>
 
 static int nsal_initialized;
 struct kvs_idx g_ns_meta_index;
+
+const int nsal_magic_symbol = 2811;
 
 /* Helper function: this will open the namespace index.
  * @param cfg_item[in]: collection item.
@@ -69,6 +72,17 @@ static int nsal_ns_open(struct collection_item *cfg_items,
 
 out:
 	log_debug("rc=%d", rc);
+	return rc;
+}
+
+int nsal_register_magic_symbol(void)
+{
+	int rc = 0;
+	rc = m0log_add_magic_sym((const void*)&nsal_magic_symbol);
+	if (rc != 0) {
+		log_err("Adding magic symbol failed at nsal, rc =%d", rc);
+	}
+
 	return rc;
 }
 

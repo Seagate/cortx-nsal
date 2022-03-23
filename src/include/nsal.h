@@ -60,4 +60,6 @@ int nsal_module_init(struct collection_item *cfg_items);
  */
 int nsal_module_fini(void);
 
+int nsal_register_magic_symbol(void);
+
 #endif /* _NSAL_H_ */
