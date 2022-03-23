@@ -320,12 +320,27 @@ struct m0kvs_key_iter *cortx_key_iter_priv(struct kvs_itr *iter)
 	return (void *) &iter->priv[0];
 }
 
+static inline
+struct m0kvs_key_iter_v1 *cortx_key_iter_priv_v1(struct kvs_itr *iter)
+{
+	return (void *) &iter->priv[0];
+}
+
 void cortx_kvs_iter_get_kv(struct kvs_itr *iter, void **key, size_t *klen,
                            void **val, size_t *vlen)
 {
 	struct m0kvs_key_iter *priv = cortx_key_iter_priv(iter);
 	perfc_trace_inii(PFT_CORTX_KVS_ITER_GET_KV, PEM_NSAL_TO_MOTR);
 	m0kvs_key_iter_get_kv(priv, key, klen, val, vlen);
+	perfc_trace_finii(PERFC_TLS_POP_DONT_VERIFY);
+}
+
+void cortx_kvs_iter_get_kv_v1(struct kvs_itr *iter, void **key, size_t *klen,
+			      void **val, size_t *vlen)
+{
+	struct m0kvs_key_iter_v1 *priv = cortx_key_iter_priv_v1(iter);
+	perfc_trace_inii(PFT_CORTX_KVS_ITER_GET_KV, PEM_NSAL_TO_MOTR);
+	m0kvs_key_iter_get_kv_v1(priv, key, klen, val, vlen);
 	perfc_trace_finii(PERFC_TLS_POP_DONT_VERIFY);
 }
 
@@ -367,6 +382,25 @@ int cortx_kvs_prefix_iter_find(struct kvs_itr *iter)
 	}
 	rc = cortx_kvs_prefix_iter_has_prefix(iter);
 out:
+	perfc_trace_attr(PEA_NS_RES_RC, rc);
+	perfc_trace_finii(PERFC_TLS_POP_DONT_VERIFY);
+	return rc;
+}
+
+int cortx_kvs_prefix_iter_find_v1(struct kvs_itr *iter)
+{
+	int rc = 0;
+	struct m0kvs_key_iter_v1 *priv = NULL;
+
+	perfc_trace_inii(PFT_CORTX_KVS_PREFIX_ITER_FIND, PEM_NSAL_TO_MOTR);
+
+	priv = cortx_key_iter_priv_v1(iter);
+	if (priv->initialized == false) {
+		priv->index = iter->idx.index_priv;
+	}
+	rc = m0kvs_key_iter_find_v1(iter->prefix.buf, iter->prefix.len, priv,
+				    iter->batch_size);
+	iter->inner_rc = rc;
 	perfc_trace_attr(PEA_NS_RES_RC, rc);
 	perfc_trace_finii(PERFC_TLS_POP_DONT_VERIFY);
 	return rc;
@@ -423,7 +457,10 @@ struct kvstore_ops cortx_kvs_ops = {
 	.kv_find = cortx_kvs_prefix_iter_find,
 	.kv_next = cortx_kvs_prefix_iter_next,
 	.kv_fini = cortx_kvs_prefix_iter_fini,
-	.kv_get = cortx_kvs_iter_get_kv
+	.kv_get = cortx_kvs_iter_get_kv,
+
+	.kv_find_v1 = cortx_kvs_prefix_iter_find_v1,
+	.kv_get_v1 = cortx_kvs_iter_get_kv_v1
 };
 
 int cortx_kvs_list_set(struct kvs_idx *index,

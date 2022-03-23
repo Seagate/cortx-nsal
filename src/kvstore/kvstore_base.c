@@ -296,6 +296,30 @@ int kvs_itr_find(struct kvstore *kvstore, struct kvs_idx *index, void *prefix,
 	return kvstore->kvstore_ops->kv_find(*iter);
 }
 
+int kvs_itr_find_v1(struct kvstore *kvstore, struct kvs_idx *index, void *prefix,
+		    const size_t prefix_len, struct kvs_itr **iter,
+		    int batch_size)
+{
+	int rc = 0;
+
+	dassert(kvstore);
+
+	if (*iter == NULL) {
+		rc = kvstore->kvstore_ops->alloc((void **)iter,
+						 sizeof(struct kvs_itr));
+		if (rc) {
+			return rc;
+		}
+		(*iter)->idx.index_priv = index->index_priv;
+		(*iter)->prefix.buf = prefix;
+		(*iter)->prefix.len = prefix_len;
+		(*iter)->batch_size = batch_size;
+	}
+		(*iter)->prefix.buf = prefix;
+		(*iter)->prefix.len = prefix_len;
+	return kvstore->kvstore_ops->kv_find_v1(*iter);
+}
+
 int kvs_itr_next(struct kvstore *kvstore, struct kvs_itr *iter)
 {
 	dassert(kvstore);
@@ -314,6 +338,13 @@ void kvs_itr_get(struct kvstore *kvstore, struct kvs_itr *iter, void **key,
 {
 	dassert(kvstore);
 	return kvstore->kvstore_ops->kv_get(iter, key, klen, val, vlen);
+}
+
+void kvs_itr_get_v1(struct kvstore *kvstore, struct kvs_itr *iter, void **key,
+		    size_t *klen, void **val, size_t *vlen)
+{
+	dassert(kvstore);
+	return kvstore->kvstore_ops->kv_get_v1(iter, key, klen, val, vlen);
 }
 
 int kvpair_alloc(struct kvpair **kv)

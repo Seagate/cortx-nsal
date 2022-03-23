@@ -154,6 +154,51 @@ out:
 	return rc;
 }
 
+#if 0
+int kvnode_load_itr(struct kvtree *tree, const node_id_t *node_id,
+                struct kvnode *node)
+{
+	struct kvnode_key *node_key = NULL;
+	int rc = 0;
+	size_t  val_size = 0;
+	struct kvnode_basic_attr *val = NULL;
+	struct kvnode_key **node_keys;
+	node_keys = alloca(batch_size * sizeof (struct kvnode_key));
+			{
+				KVNODE_KEY_INIT(node_key[j], value[j], KVTREE_KEY_TYPE_BASIC_ATTR);
+			}
+
+	dassert(tree);
+	dassert(node_id);
+	dassert(node);
+
+	struct kvstore *kvstor = kvstore_get();
+	dassert(kvstor);
+
+	RC_WRAP_LABEL(rc, out, kvs_alloc, kvstor, (void **)&node_key,
+	              sizeof(struct kvnode_key));
+
+	KVNODE_KEY_INIT(node_key, *node_id, KVTREE_KEY_TYPE_BASIC_ATTR);
+
+	RC_WRAP_LABEL(rc, free_key, kvs_get, kvstor, &tree->index, node_key,
+	              sizeof(struct kvnode_key), (void **)&val, &val_size);
+
+	dassert(val);
+	dassert(val_size == (sizeof(struct kvnode_basic_attr) + val->size));
+
+	node->tree = tree;
+	node->node_id = *node_id;
+	node->basic_attr = val;
+
+free_key:
+	kvs_free(kvstor, node_key);
+out:
+	log_debug("kvtree=%p, node_id " NODE_ID_F ", rc=%d", tree,
+	           NODE_ID_P(node_id), rc);
+	return rc;
+}
+#endif
+
 int kvnode_delete(const struct kvnode *node)
 {
 	struct kvnode_key *node_key = NULL;

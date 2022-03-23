@@ -350,6 +350,84 @@ int kvtree_has_children(struct kvtree *tree, const node_id_t *parent_id,
 	return rc;
 }
 
+int kvtree_iter_children_v1(struct kvtree *tree,
+		const node_id_t *parent_id, kvtree_iter_children_cb cb,
+		void *cb_ctx)
+{
+	struct child_node_key prefix = CHILD_NODE_PREFIX_INIT(parent_id);
+	size_t prefix_len = child_node_psize;
+	int rc;
+	size_t *klen, *vlen, last_key_len;
+	struct kvs_itr *iter = NULL;
+	struct child_node_key **key, *last_key = NULL;
+	node_id_t **value;
+	// const char *child_node_name;
+	int batch_size = 128;
+	int i, j;
+	bool finished = false;
+	struct kvstore *kvstor = kvstore_get();
+
+	dassert(kvstor != NULL);
+
+	key = alloca(batch_size * sizeof (struct child_node_key *));
+	value = alloca(batch_size * sizeof (node_id_t *));
+	klen = alloca(sizeof (size_t) * batch_size);
+	vlen = alloca(sizeof (size_t) * batch_size);
+
+	while (1) {
+		RC_WRAP_LABEL(rc, out, kvs_itr_find_v1, kvstor, &tree->index,
+				&prefix, prefix_len, &iter, batch_size);
+		i = 0;
+		while (1) {
+			kvs_itr_get_v1(kvstor, iter, (void**)&key[i], &klen[i],
+					(void **)&value[i], &vlen[i]);
+
+			if (key[i] == NULL || value[i] == NULL || klen[i] == 0 ||
+			    vlen[i] == 0) {
+				break;
+			}
+
+			if (klen[i] < child_node_psize || 
+			   (memcmp(&prefix, key[i], child_node_psize) != 0) || 
+			    key[i]->name.s_len <= 0) {
+				finished = true;
+				break;
+			}
+
+			/*Child name cannot be empty*/
+			dassert(klen[i] > child_node_psize);
+			/* The klen[i] is limited by the size of the child node structure.
+			*/
+			dassert(klen[i] <= sizeof(struct child_node_key));
+			dassert(vlen[i] == sizeof(*value[i]));
+			dassert(key[i]->name.s_len != 0);
+
+			// child_node_name = key[i]->name.s_str;
+			last_key = key[i]; last_key_len = klen[i];
+			i++;
+		}
+		for (j = 0; j < i; j++) {
+			log_info("CURR klen:%ld vlen:%ld name:%s nodeid:" NODE_ID_F,
+				 klen[j], vlen[j],key[j]->name.s_str,
+				 NODE_ID_P(value[j]));
+		}
+		if (finished == true) {
+			break;
+		}
+		prefix = *last_key;
+		prefix_len = last_key_len;
+	}
+
+out:
+	/* Check if iteration was interrupted by an internal KVS error */
+	if (rc == -ENOENT) {
+		log_info("No more entries.");
+		rc = 0;
+	}
+	kvs_itr_fini(kvstor, iter);
+	log_info("rc %d", rc);
+	return rc;
+}
 static inline int __kvtree_iter_children(struct kvtree *tree,
 		const node_id_t *parent_id, kvtree_iter_children_cb cb,
 		void *cb_ctx)
